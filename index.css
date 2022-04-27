@@ -1,1 +1,82 @@
-[v-cloak]{display:none !important}*{box-sizing:border-box;text-overflow:ellipsis;white-space:nowrap;user-select:none}body{margin:0}#config{width:100%;height:100%;position:absolute;display:grid;grid-template-columns:260px auto}#content{background:#ededed;overflow:auto}#content .first_load{width:100%;height:100%;display:flex;flex-direction:column;justify-content:space-around;align-items:center}#content .first_load .first_load_img{width:300px;height:300px}
+/* 全局设置 */
+* {
+	box-sizing: border-box;
+}
+/* 去白边 */
+body {
+	margin: 0;
+}
+.flex_shrink {
+	flex-shrink: 0;
+}
+/* 主体 */
+#login {
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	min-width: 1400px;
+	min-height: 1000px;
+}
+/* 背景图 */
+.backgroundImage {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	z-index: -10;
+}
+/* 图标 */
+.logo {
+	position: fixed;
+	top: 50px;
+	left: 80px;
+	width: 120px;
+	height: 26px;
+}
+/* 背景墙 */
+.backdrop {
+	background: rgba(255, 255, 255, 0.3);
+	width: 430px;
+	height: 520px;
+	position: absolute;
+	top: 19.4vh;
+	right: 10.5vw;
+	border: 2px solid rgba(29, 111, 195, 0.3);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+/* 用户输入部分 */
+.main {
+	width: 420px;
+	height: 510px;
+	background-color: #fff;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-around;
+	padding-left: 64px;
+}
+/* 用户登录标题 */
+.main .title {
+	color: #1c61ec;
+	font-size: 22px;
+}
+/* 用户输入框 */
+.main .userInput {
+	width: 290px;
+}
+/* 占位符样式 */
+.main .userInput::-webkit-input-placeholder {
+	font-weight: 400;
+	font-size: 1.7vh;
+	font-family: Microsoft YaHei;
+	position: relative;
+	left: 1.4vw;
+	line-height: 5.7vh;
+}
+/* 登录按钮 */
+.main .loginBotton {
+	font-size: 22px;
+	width: 290px;
+	height: 52px;
+}

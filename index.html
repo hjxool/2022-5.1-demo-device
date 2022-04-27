@@ -5,32 +5,27 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>配置</title>
-  <link rel="stylesheet" href="./module/element-ui.css">
+  <title>湖山物联网云平台</title>
+  <link rel="icon" href="./img/logo.ico">
+  <link rel="stylesheet" href="../module/element-ui.css">
   <link rel="stylesheet" href="./index.css">
 </head>
 
 <body>
-  <div v-loading="static_param.page_loading" element-loading-text="拼命加载中" element-loading-spinner="el-icon-loading"
-    element-loading-background="rgba(0, 0, 0, 0.8)" id="config" v-cloak>
-    <!-- 左边栏 -->
-    <el-menu @select="menuSelected" background-color="#494949" text-color="#fff" active-text-color="#fff">
-      <el-menu-item index="1" style="font-size: 16px;">会议室1</el-menu-item>
-      <el-menu-item index="2" style="font-size: 16px;">会议室2</el-menu-item>
-    </el-menu>
-    <!-- 内容切换显示 -->
-    <div id="content">
-      <!-- 第一次加载显示统计图 -->
-      <div class="first_load" v-show="static_param.first_load">
-        <img src="./img/下载桌面选中.png" class="first_load_img">
-        <img src="./img/下载移动选中.png" class="first_load_img">
+  <div id="login">
+    <img src="./img/logo白.png" class="logo">
+    <img src="./img/loginBackground@2x.png" class="backgroundImage">
+    <div class="backdrop">
+      <div class="main">
+        <span class="title">用户登录</span>
+        <el-input class="userInput" v-model="userName" placeholder="用户名" clearable></el-input>
+        <el-input class="userInput" v-model="passWord" placeholder="密码" clearable show-password></el-input>
+        <el-checkbox v-model="rememberPassword">记住密码</el-checkbox>
+        <el-button class="loginBotton" type="primary" @click="login">登录</el-button>
       </div>
-      <!-- 点击会议室显示常用设备配置 -->
-      <div class=""></div>
     </div>
   </div>
-
-  <script src="./module/jquery-3.6.0.js"></script>
+  <script src="./main.js"></script>
   <script src="./module/vue.js"></script>
   <script src="./module/element-ui.js"></script>
   <script src="./module/axios.min.js"></script>
