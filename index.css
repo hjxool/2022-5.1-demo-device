@@ -1,3 +1,6 @@
+[v-cloak] {
+	display: none !important;
+}
 /* 全局设置 */
 * {
 	box-sizing: border-box;

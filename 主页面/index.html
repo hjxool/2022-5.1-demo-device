@@ -14,11 +14,32 @@
 <body>
   <div id="config" v-loading="static_param.page_loading" element-loading-text="拼命加载中"
     element-loading-spinner="el-icon-loading" element-loading-background="rgba(0, 0, 0, 0.8)" v-cloak>
+    <!-- 抬头 -->
+    <div class="header">
+      <img src="./img/logo2.png" class="flex_shrink" style="width: 110px; height: 28px; margin: 0px 20px;">
+      <img src="./img/矢量智能对象@2x.png" class="flex_shrink" style="width: 22px; height: 22px;">
+      <span class="flex_shrink" style="font-size: 20px; color: rgb(79, 129, 255); margin-left: 28px;">湖山物联网云平台</span>
+      <div style="display: flex; align-items: center; margin: 0px 36px 0px auto;">
+        <span class="calender flex_shrink">{{static_param.calender}}</span>
+        <span class="weekDay flex_shrink">{{static_param.weekDay}}</span>
+        <span class="time flex_shrink">{{static_param.time}}</span>
+      </div>
+      <a href="../index.html" class="center">
+        <img src="./img/退出@2x (1).png" class="button" style="width: 46px;height: 46px;margin-right: 30px;">
+      </a>
+      <div class="decLine"></div>
+    </div>
     <!-- 左边栏 -->
     <div class="nav_bar">
-      <div class="menu_item center" v-for="menu,index in temp.changsuo_list" :style="menu_item_style(index)"
-        @click="menu_select(index)">{{menu}}
+      <!-- 回到中心平台按钮 -->
+      <div class="button center" style="width: 140px;height: 52px;justify-self: center;" @click="jump_hscenter">
+        <img src="./img/button2light.png" class="bg_img">
+        <span style="font-size: 14px;color: #84D5FE">返回项目中心</span>
       </div>
+      <div></div>
+      <!-- 场所 -->
+      <div class="menu_item center" v-for="menu,index in temp.changsuo_list" :style="menu_item_style(index)"
+        @click="menu_select(index)">{{menu}}</div>
     </div>
     <!-- 内容切换显示 -->
     <div id="content">
@@ -27,7 +48,7 @@
         <img src="./img/logo.png" class="first_load_img">
       </div>
       <!-- 点击会议室显示常用设备配置 -->
-      <div class="normal_config" v-show="!static_param.first_load">
+      <div class="normal_config" v-show="!static_param.first_load&static_param.menu_select==0">
         <!-- 电源 -->
         <div class="box_style flex_shrink two_row_layout" style="width: 238px;height: 140px;">
           <span class="title">系统电源</span>
@@ -62,12 +83,12 @@
         <!-- 全屏 -->
         <div class="box_style flex_shrink center" style="width: 500px;height: 140px;" v-loading="static_param.ban"
           element-loading-background="rgba(0, 0, 0, 0.8)" element-loading-spinner="none">
-          <div class="button center" style="justify-content: center;width: 178px;height: 52px;">
+          <div class="button center" style="justify-content: center;width: 178px;height: 52px;" @click="scene_ctrl(1)">
             <img src="./img/button1.png" class="bg_img">
             <img src="./img/全屏.png" style="width: 18px;height: 18px;margin-right: 6px;">
             <span style="font-size: 16px;color: #84D5FE;">全屏模式</span>
           </div>
-          <div class="button center" style="justify-content: center;width: 178px;height: 52px;">
+          <div class="button center" style="justify-content: center;width: 178px;height: 52px;" @click="scene_ctrl(3)">
             <img src="./img/button1.png" class="bg_img">
             <img src="./img/半屏.png" style="width: 18px;height: 18px;margin-right: 6px;">
             <span style="font-size: 16px;color: #84D5FE;">小屏模式</span>
@@ -79,6 +100,7 @@
           <span class="title">视频信号</span>
           <div class="border_top center">
             <!-- 视频源 -->
+            <h3 style="color: white;width: 95%;opacity: 0.9;">输入信号</h3>
             <div class="button center" style="width: 140px;height: 60px;"
               v-for="video,index in static_param.video_source" @click="video_select(index,'in')">
               <img :src="static_param.video_source_checked == index?'./img/button2light.png':'./img/button2.png'"
@@ -86,7 +108,7 @@
               <span :style="video_style(index)">{{video}}</span>
             </div>
             <!-- 输出 -->
-            <h2 style="color: white;width: 95%;opacity: 0.9;">输出信号</h2>
+            <h3 style="color: white;width: 95%;opacity: 0.9;">输出信号</h3>
             <div class="button center" style="width: 140px;height: 60px;" v-for="video,index in static_param.video_out"
               @click="video_select(index,'out')">
               <img :src="static_param.video_out_checked == index?'./img/button2light.png':'./img/button2.png'"
@@ -139,9 +161,11 @@
           element-loading-background="rgba(0, 0, 0, 0.8)" element-loading-spinner="none">
           <span class="title">{{device.name}}</span>
           <div class="center border_top">
-            <img src="./img/圆加.png" class="button" style="width: 58px;height: 58px;" @click="increase_gain(device)">
-            <img src="./img/圆减.png" class="button" style="width: 58px;height: 58px;" @click="decrease_gain(device)">
-            <div class="center button" style="width: 100px;height: 58px;" @click="mute(device)">
+            <img src="./img/圆加.png" class="button" style="width: 58px;height: 58px;"
+              @click="increase_gain(device.name)">
+            <img src="./img/圆减.png" class="button" style="width: 58px;height: 58px;"
+              @click="decrease_gain(device.name)">
+            <div class="center button" style="width: 100px;height: 58px;" @click="mute(device,device.name)">
               <img :src="device.mute==0?'./img/button2.png':'./img/button2red.png'" class="bg_img">
               <span :style="mute_style(device)">静音</span>
             </div>
@@ -156,6 +180,10 @@
             <div class="three_row_layout">
               <div class="center" style="justify-content: space-between;">
                 <img src="./img/开关按钮.png" class="button" style="width: 58px;height: 58px;" @click="tv_meeting(0)">
+                <div class="center button" style="width: 100px;height: 58px;" @click="tv_meeting(36)">
+                  <img src="./img/button2.png" class="bg_img">
+                  <span class="simple_text_style">一键双流</span>
+                </div>
                 <div class="center button" style="width: 100px;height: 58px;" @click="tv_meeting(35)">
                   <img src="./img/button2.png" class="bg_img">
                   <span class="simple_text_style">双流</span>
@@ -251,9 +279,12 @@
           </div>
         </div>
       </div>
+      <div class="center" style="width: 100%;height: 100%;font-size: 24px;color: whitesmoke;"
+        v-show="!static_param.first_load&static_param.menu_select!=0">暂无设备</div>
     </div>
   </div>
 
+  <script src="../main.js"></script>
   <script src="../module/vue.js"></script>
   <script src="../module/element-ui.js"></script>
   <script src="../module/axios.min.js"></script>

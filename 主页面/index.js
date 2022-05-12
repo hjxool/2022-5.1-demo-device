@@ -1,17 +1,9 @@
-let url = 'http://192.168.30.66:18113/';
-let sys_power_url = url + 'api/ake/sequenceSwitch';
-let sound_box_url = url + 'api/room/loudspeakerBoxLocationControl';
-let video_out_url = url + 'api/room/hdMatrixControl';
-let camera_ctrl_url = url + 'api/room/cameraLocationControl';
-let get_before_mix_url = url + 'api/gds/getBeforeMixingInfo';
-let before_mix_ctrl_url = url + 'api/gds/beforeMixingControl';
-let tv_meeting_ctrl_url = url + 'api/room/videoConferenceControl';
-
 let config = new Vue({
 	el: '#config',
 	data: {
 		loginToken: '',
 		userName: '',
+		device_id: '0x12345622F955000000000000',
 		static_param: {
 			menu_select: -1, //导航栏选中目标
 			page_loading: false, //页面加载时遮罩
@@ -42,9 +34,12 @@ let config = new Vue({
 			// 摄像机
 			camera_list: ['A1', 'A2', 'A3'],
 			camera_select: 0, //选中的摄像机位
+			calender: '', //日期
+			weekDay: '', //星期
+			time: '', //当前时间
 		},
 		temp: {
-			changsuo_list: ['会议室1', '会议室2'],
+			changsuo_list: ['二楼会议室', '四楼会议室', '圆桌会议室'],
 		},
 	},
 	mounted() {
@@ -60,9 +55,14 @@ let config = new Vue({
 				Object.assign(e, res.data.data[index]);
 			});
 		});
+		this.get_time();
+		this.timer = setInterval(this.get_time, 1000);
 		// this.request('post', `http://192.168.30.200:9201/api-auth/oauth/user/token`, { username: 'dasd', password: '1231231' }, '23123', this.loginToken, (res) => {
 		// 	console.log(res);
 		// });
+	},
+	beforeDestroy() {
+		clearInterval(this, timer);
 	},
 	methods: {
 		// 获取地址栏token
@@ -192,9 +192,9 @@ let config = new Vue({
 			} else {
 				if (this.static_param.video_source_checked != -1) {
 					this.static_param.video_out_checked = index;
-					this.request('post', video_out_url, { device_id: '0x021100000000000000000000', input_no: this.static_param.video_source_checked + 1, output_no: this.static_param.video_out_checked + 1 }, '123456', this.loginToken, () => {});
+					this.request('post', video_out_url, { device_id: this.device_id, input_no: this.static_param.video_source_checked + 1, output_no: this.static_param.video_out_checked + 1 }, '123456', this.loginToken, () => {});
 				} else {
-					this.$message.warning('请先选择输出信号');
+					this.$message.warning('请先选择输入信号');
 				}
 			}
 		},
@@ -206,45 +206,64 @@ let config = new Vue({
 			};
 			return style;
 		},
-		mute(obj) {
+		mute(obj, name) {
+			let type;
 			if (obj.mute == 0) {
-				obj.mute = 1;
+				type = 2;
 			} else {
-				obj.mute = 0;
+				type = 3;
 			}
-			let input = [
-				{
-					channel_no: obj.channel_no,
-					reverse_phase: obj.reverse_phase,
-					gain: obj.gain,
-					mute: obj.mute,
-				},
-			];
-			this.request('post', before_mix_ctrl_url, { device_id: '0x333333333333333333000000', input: input }, '123456', this.loginToken, () => {});
+			let channels;
+			switch (name) {
+				case '会议话筒':
+					channels = [1, 2];
+					break;
+				case '电脑音量':
+					channels = [3];
+					break;
+				case '视频会议':
+					channels = [4];
+					break;
+			}
+			this.request('post', volumeControl_url, { device_id: this.device_id, channels: channels, type: type }, '123456', this.loginToken, () => {
+				if (obj.mute == 0) {
+					obj.mute = 1;
+				} else {
+					obj.mute = 0;
+				}
+			});
 		},
-		increase_gain(obj) {
-			obj.gain = Math.floor(obj.gain) + 10;
-			let input = [
-				{
-					channel_no: obj.channel_no,
-					reverse_phase: obj.reverse_phase,
-					gain: obj.gain,
-					mute: obj.mute,
-				},
-			];
-			this.request('post', before_mix_ctrl_url, { device_id: '0x333333333333333333000000', input: input }, '123456', this.loginToken, () => {});
+		increase_gain(name) {
+			let type = 0;
+			let channels;
+			switch (name) {
+				case '会议话筒':
+					channels = [1, 2];
+					break;
+				case '电脑音量':
+					channels = [3];
+					break;
+				case '视频会议':
+					channels = [4];
+					break;
+			}
+			this.request('post', volumeControl_url, { device_id: this.device_id, channels: channels, type: type }, '123456', this.loginToken, () => {});
 		},
-		decrease_gain(obj) {
-			obj.gain = Math.floor(obj.gain) - 10;
-			let input = [
-				{
-					channel_no: obj.channel_no,
-					reverse_phase: obj.reverse_phase,
-					gain: obj.gain,
-					mute: obj.mute,
-				},
-			];
-			this.request('post', before_mix_ctrl_url, { device_id: '0x333333333333333333000000', input: input }, '123456', this.loginToken, () => {});
+		decrease_gain(name) {
+			let type = 1;
+			let channels;
+			switch (name) {
+				case '会议话筒':
+					channels = [1, 2];
+					break;
+				case '电脑音量':
+					channels = [3];
+					break;
+				case '视频会议':
+					channels = [4];
+					break;
+			}
+			this.request('post', volumeControl_url, { device_id: this.device_id, channels: channels, type: type }, '123456', this.loginToken, () => {});
 		},
 		// 摄像机
 		camera_style(index) {
@@ -256,21 +275,50 @@ let config = new Vue({
 		},
 		camera_ctrl(type) {
 			let name = this.static_param.camera_list[this.static_param.camera_select];
-			this.request('post', camera_ctrl_url, { device_id: '0x085700000000000000000000', type: type, name: name }, '123456', this.loginToken, (res) => {
+			this.request('post', camera_ctrl_url, { device_id: this.device_id, type: type, name: name }, '123456', this.loginToken, (res) => {
 				if (res.data.code == 1000) {
 					setTimeout(() => {
-						this.request('post', camera_ctrl_url, { device_id: '0x085700000000000000000000', type: 4, name: name }, '123456', this.loginToken, () => {});
+						this.request('post', camera_ctrl_url, { device_id: this.device_id, type: 4, name: name }, '123456', this.loginToken, () => {});
 					}, 1000);
 				}
 			});
 		},
 		// 音箱位置
 		sound_box_ctrl(type) {
-			this.request('post', sound_box_url, { device_id: '0x098500000000000000000000', type: type }, '123456', this.loginToken, () => {});
+			this.request('post', sound_box_url, { device_id: this.device_id, type: type }, '123456', this.loginToken, () => {});
 		},
 		// 视频会议
 		tv_meeting(type) {
-			this.request('post', tv_meeting_ctrl_url, { device_id: '0x13140108B27F000000000000', type: type }, '123456', this.loginToken, () => {});
+			this.request('post', tv_meeting_ctrl_url, { device_id: this.device_id, type: type }, '123456', this.loginToken, () => {});
+		},
+		// 跳转中心平台
+		jump_hscenter() {
+			window.open(`http://182.150.116.22:10009/hscenter/index.html?loginToken=${this.loginToken}&userName=${this.userName}`);
+		},
+		// 获取时间
+		get_time() {
+			let date = new Date();
+			function check(params) {
+				let num = params < 10 ? `0${params}` : params;
+				return num;
+			}
+			let year = date.getFullYear();
+			let month = check(date.getMonth() + 1);
+			let day = check(date.getDate());
+			this.static_param.calender = `${year}.${month}.${day}`;
+
+			let weeks = ['星期天', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+			let week = date.getDay();
+			this.static_param.weekDay = weeks[week];
+
+			let hour = check(date.getHours());
+			let minute = check(date.getMinutes());
+			let second = check(date.getSeconds());
+			this.static_param.time = `${hour}:${minute}:${second}`;
+		},
+		// 全屏半屏
+		scene_ctrl(scene_no) {
+			this.request('post', scene_ctrl_url, { device_id: this.device_id, scene_no: scene_no }, '123456', this.loginToken, () => {});
 		},
 	},
 });
