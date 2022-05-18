@@ -3,7 +3,7 @@ let config = new Vue({
 	data: {
 		loginToken: '',
 		userName: '',
-		device_id: '0x12345622F955000000000000',
+		device_id: '',
 		static_param: {
 			menu_select: -1, //导航栏选中目标
 			page_loading: false, //页面加载时遮罩
@@ -32,14 +32,14 @@ let config = new Vue({
 				{ name: '#', type: 12 },
 			],
 			// 摄像机
-			camera_list: ['A1', 'A2', 'A3'],
+			camera_list: ['前置摄像头', '右摄像头', '左摄像头'],
 			camera_select: 0, //选中的摄像机位
 			calender: '', //日期
 			weekDay: '', //星期
 			time: '', //当前时间
 		},
 		temp: {
-			changsuo_list: ['二楼会议室', '四楼会议室', '圆桌会议室'],
+			changsuo_list: ['二楼会议室', '报告厅', '四楼会议室', '圆桌会议室'],
 		},
 	},
 	mounted() {
@@ -49,12 +49,6 @@ let config = new Vue({
 		} else {
 			this.get_token();
 		}
-		this.request('post', get_before_mix_url, { device_id: '0x333333333333333333000000' }, '74935343174538', this.loginToken, (res) => {
-			this.static_param.mute_device.forEach((e, index) => {
-				// 提前准备好的属性在合并和依然具有响应性
-				Object.assign(e, res.data.data[index]);
-			});
-		});
 		this.get_time();
 		this.timer = setInterval(this.get_time, 1000);
 		// this.request('post', `http://192.168.30.200:9201/api-auth/oauth/user/token`, { username: 'dasd', password: '1231231' }, '23123', this.loginToken, (res) => {
@@ -127,6 +121,14 @@ let config = new Vue({
 		},
 		//导航栏选中
 		menu_select(index) {
+			switch (this.static_param.menu_select) {
+				case 0:
+					this.device_id = '0x12345622F955000000000000';
+					break;
+				case 1:
+					this.device_id = '';
+					break;
+			}
 			this.static_param.first_load = false;
 			this.static_param.menu_select = index;
 		},
@@ -192,7 +194,17 @@ let config = new Vue({
 			} else {
 				if (this.static_param.video_source_checked != -1) {
 					this.static_param.video_out_checked = index;
-					this.request('post', video_out_url, { device_id: this.device_id, input_no: this.static_param.video_source_checked + 1, output_no: this.static_param.video_out_checked + 1 }, '123456', this.loginToken, () => {});
+					switch (this.static_param.video_source_checked) {
+						case 0:
+							this.request('post', video_out_url, { device_id: this.device_id, input_no: 4, output_no: this.static_param.video_out_checked + 1 }, '123456', this.loginToken, () => {});
+							break;
+						case 3:
+							this.request('post', video_out_url, { device_id: this.device_id, input_no: 1, output_no: this.static_param.video_out_checked + 1 }, '123456', this.loginToken, () => {});
+							break;
+						default:
+							this.request('post', video_out_url, { device_id: this.device_id, input_no: this.static_param.video_source_checked + 1, output_no: this.static_param.video_out_checked + 1 }, '123456', this.loginToken, () => {});
+							break;
+					}
 				} else {
 					this.$message.warning('请先选择输入信号');
 				}

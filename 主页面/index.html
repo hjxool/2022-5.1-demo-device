@@ -279,8 +279,241 @@
           </div>
         </div>
       </div>
+      <!-- 临时 报告厅设备 -->
+      <div class="normal_config" v-show="!static_param.first_load&static_param.menu_select==1">
+        <!-- 电源 -->
+        <div class="box_style flex_shrink two_row_layout" style="width: 238px;height: 140px;">
+          <span class="title">系统电源</span>
+          <div class="border_top center">
+            <div class="center" @click="sys_power_switch">
+              <span style="font-size: 14px;color: #0AAF50;">ON</span>
+              <div style="width: 100px;height: 30px;position: relative;z-index: 10;">
+                <img src="./img/横向滑轨.png" class="bg_img">
+                <img src="./img/滑钮.png" :style="sys_power_style()">
+                <div :style="sys_power_style2()"></div>
+              </div>
+              <span style="font-size: 14px;color: rgba(243, 38, 38, 0.78)">OFF</span>
+            </div>
+          </div>
+        </div>
+        <!-- 吸顶音箱 -->
+        <div class="box_style flex_shrink center" style="width: 500px;height: 140px;" v-loading="static_param.ban"
+          element-loading-background="rgba(0, 0, 0, 0.8)" element-loading-spinner="none">
+          <div class="button center" style="justify-content: center;width: 178px;height: 52px;"
+            @click="sound_box_ctrl(1)">
+            <img src="./img/button1.png" class="bg_img">
+            <img src="./img/箭头下.png" style="width: 16px;height: 18px;margin-right: 6px;">
+            <span style="font-size: 16px;color: #84D5FE;">吸顶音箱下降</span>
+          </div>
+          <div class="button center" style="justify-content: center;width: 178px;height: 52px;"
+            @click="sound_box_ctrl(0)">
+            <img src="./img/button1.png" class="bg_img">
+            <img src="./img/箭头上.png" style="width: 16px;height: 18px;margin-right: 6px;">
+            <span style="font-size: 16px;color: #84D5FE;">吸顶音箱收起</span>
+          </div>
+        </div>
+        <!-- 全屏 -->
+        <div class="box_style flex_shrink center" style="width: 500px;height: 140px;" v-loading="static_param.ban"
+          element-loading-background="rgba(0, 0, 0, 0.8)" element-loading-spinner="none">
+          <div class="button center" style="justify-content: center;width: 178px;height: 52px;" @click="scene_ctrl(1)">
+            <img src="./img/button1.png" class="bg_img">
+            <img src="./img/全屏.png" style="width: 18px;height: 18px;margin-right: 6px;">
+            <span style="font-size: 16px;color: #84D5FE;">全屏模式</span>
+          </div>
+          <div class="button center" style="justify-content: center;width: 178px;height: 52px;" @click="scene_ctrl(3)">
+            <img src="./img/button1.png" class="bg_img">
+            <img src="./img/半屏.png" style="width: 18px;height: 18px;margin-right: 6px;">
+            <span style="font-size: 16px;color: #84D5FE;">小屏模式</span>
+          </div>
+        </div>
+        <!-- 视频信号 -->
+        <div class="box_style flex_shrink two_row_layout" style="width: 678px;height: 390px;"
+          v-loading="static_param.ban" element-loading-background="rgba(0, 0, 0, 0.8)" element-loading-spinner="none">
+          <span class="title">视频信号</span>
+          <div class="border_top center">
+            <!-- 视频源 -->
+            <h3 style="color: white;width: 95%;opacity: 0.9;">输入信号</h3>
+            <div class="button center" style="width: 140px;height: 60px;"
+              v-for="video,index in static_param.video_source" @click="video_select(index,'in')">
+              <img :src="static_param.video_source_checked == index?'./img/button2light.png':'./img/button2.png'"
+                class="bg_img">
+              <span :style="video_style(index)">{{video}}</span>
+            </div>
+            <!-- 输出 -->
+            <h3 style="color: white;width: 95%;opacity: 0.9;">输出信号</h3>
+            <div class="button center" style="width: 140px;height: 60px;" v-for="video,index in static_param.video_out"
+              @click="video_select(index,'out')">
+              <img :src="static_param.video_out_checked == index?'./img/button2light.png':'./img/button2.png'"
+                class="bg_img">
+              <span :style="video_style2(index)">{{video}}</span>
+            </div>
+          </div>
+        </div>
+        <!-- 选择摄像机 -->
+        <div class="box_style flex_shrink two_row_layout" style="width: 280px;height: 390px;"
+          v-loading="static_param.ban" element-loading-background="rgba(0, 0, 0, 0.8)" element-loading-spinner="none">
+          <span class="title">摄像机位</span>
+          <div class="border_top center">
+            <div class="button center" style="width: 140px;height: 60px;"
+              v-for="camera,index in static_param.camera_list" @click="static_param.camera_select=index">
+              <img :src="static_param.camera_select == index?'./img/button2light.png':'./img/button2.png'"
+                class="bg_img">
+              <span :style="camera_style(index)">{{camera}}</span>
+            </div>
+          </div>
+        </div>
+        <!-- 摄像机控制 -->
+        <div class="box_style flex_shrink two_row_layout" style="width: 280px;height: 390px;"
+          v-loading="static_param.ban" element-loading-background="rgba(0, 0, 0, 0.8)" element-loading-spinner="none">
+          <span class="title">摄像机{{static_param.camera_list[static_param.camera_select]}}</span>
+          <div class="border_top center">
+            <!-- 方向 -->
+            <div class="camera_orientation">
+              <img src="./img/upbutton.png" class="button" style="grid-area: up;" @click="camera_ctrl(0)">
+              <img src="./img/leftbutton.png" class="button" style="grid-area: left;" @click="camera_ctrl(2)">
+              <img src="./img/rightbutton.png" class="button" style="grid-area: right;" @click="camera_ctrl(3)">
+              <img src="./img/downbutton.png" class="button" style="grid-area: down;" @click="camera_ctrl(1)">
+            </div>
+            <!-- 远近 -->
+            <div class="center">
+              <div class="center button" style="width: 110px;height: 52px;" @click="camera_ctrl(5)">
+                <img src="./img/button2.png" class="bg_img">
+                <span class="simple_text_style">近</span>
+              </div>
+              <div class="center button" style="width: 110px;height: 52px;" @click="camera_ctrl(6)">
+                <img src="./img/button2.png" class="bg_img">
+                <span class="simple_text_style">远</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- 会议话筒 电脑音量 视频会议 -->
+        <div class="box_style flex_shrink two_row_layout" style="width: 412px;height:146px"
+          v-for="device in static_param.mute_device" v-loading="static_param.ban"
+          element-loading-background="rgba(0, 0, 0, 0.8)" element-loading-spinner="none">
+          <span class="title">{{device.name}}</span>
+          <div class="center border_top">
+            <img src="./img/圆加.png" class="button" style="width: 58px;height: 58px;"
+              @click="increase_gain(device.name)">
+            <img src="./img/圆减.png" class="button" style="width: 58px;height: 58px;"
+              @click="decrease_gain(device.name)">
+            <div class="center button" style="width: 100px;height: 58px;" @click="mute(device,device.name)">
+              <img :src="device.mute==0?'./img/button2.png':'./img/button2red.png'" class="bg_img">
+              <span :style="mute_style(device)">静音</span>
+            </div>
+          </div>
+        </div>
+        <!-- 呼叫 -->
+        <div class="box_style flex_shrink two_row_layout" style="width: 100%;height:292px;" v-loading="static_param.ban"
+          element-loading-background="rgba(0, 0, 0, 0.8)" element-loading-spinner="none">
+          <span class="title">呼叫</span>
+          <div class="center border_top">
+            <!-- 第一列 -->
+            <div class="three_row_layout">
+              <div class="center" style="justify-content: space-between;">
+                <img src="./img/开关按钮.png" class="button" style="width: 58px;height: 58px;" @click="tv_meeting(0)">
+                <div class="center button" style="width: 100px;height: 58px;" @click="tv_meeting(36)">
+                  <img src="./img/button2.png" class="bg_img">
+                  <span class="simple_text_style">一键双流</span>
+                </div>
+                <div class="center button" style="width: 100px;height: 58px;" @click="tv_meeting(35)">
+                  <img src="./img/button2.png" class="bg_img">
+                  <span class="simple_text_style">双流</span>
+                </div>
+              </div>
+              <div class="center">
+                <!-- 1~6 -->
+                <div class="center button button_gap" style="width: 58px;height: 58px;" v-for="num in 6"
+                  @click="tv_meeting(num)">
+                  <img src="./img/circlebutton.png" class="bg_img">
+                  <span class="simple_text_style">{{num}}</span>
+                </div>
+              </div>
+              <div class="center">
+                <!-- 7~# -->
+                <div class="center button button_gap" style="width: 58px;height: 58px;"
+                  v-for="num in static_param.num_list" @click="tv_meeting(num.type)">
+                  <img src="./img/circlebutton.png" class="bg_img">
+                  <span class="simple_text_style">{{num.name}}</span>
+                </div>
+              </div>
+            </div>
+            <!-- 第二列 -->
+            <div class="three_row_layout">
+              <div class="center">
+                <div class="button center button_gap" style="width: 100px;height: 58px;" @click="tv_meeting(18)">
+                  <img src="./img/button2.png" class="bg_img">
+                  <span class="simple_text_style">呼叫</span>
+                </div>
+                <img src="./img/upbutton.png" class="button button_gap" style="width: 46px;height: 46px;"
+                  @click="tv_meeting(20)">
+                <div class="button center button_gap" style="width: 100px;height: 58px;" @click="tv_meeting(19)">
+                  <img src="./img/button2.png" class="bg_img">
+                  <span class="simple_text_style">挂断</span>
+                </div>
+              </div>
+              <div class="center">
+                <img src="./img/leftbutton.png" class="button button_gap" style="width: 46px;height: 46px;"
+                  @click="tv_meeting(22)">
+                <div class="button center button_gap" style="width: 100px;height: 58px;" @click="tv_meeting(24)">
+                  <img src="./img/button2.png" class="bg_img">
+                  <span class="simple_text_style">确定</span>
+                </div>
+                <img src="./img/rightbutton.png" class="button button_gap" style="width: 46px;height: 46px;"
+                  @click="tv_meeting(23)">
+              </div>
+              <div class="center">
+                <div class="button center button_gap" style="width: 100px;height: 58px;" @click="tv_meeting(17)">
+                  <img src="./img/button2.png" class="bg_img">
+                  <span class="simple_text_style">通讯录</span>
+                </div>
+                <img src="./img/downbutton.png" class="button button_gap" style="width: 46px;height: 46px;"
+                  @click="tv_meeting(21)">
+                <div class="button center button_gap" style="width: 100px;height: 58px;" @click="tv_meeting(13)">
+                  <img src="./img/button2.png" class="bg_img">
+                  <span class="simple_text_style">退格</span>
+                </div>
+              </div>
+            </div>
+            <!-- 第三列 -->
+            <div class="three_row_layout">
+              <div class="center">
+                <div class="button center button_gap" style="width: 100px;height: 58px;" @click="tv_meeting(27)">
+                  <img src="./img/button2.png" class="bg_img">
+                  <span class="simple_text_style">菜单</span>
+                </div>
+                <div class="button center button_gap" style="width: 100px;height: 58px;" @click="tv_meeting(26)">
+                  <img src="./img/button2.png" class="bg_img">
+                  <span class="simple_text_style">HOME</span>
+                </div>
+                <div class="button center button_gap" style="width: 100px;height: 58px;" @click="tv_meeting(25)">
+                  <img src="./img/button2.png" class="bg_img">
+                  <span class="simple_text_style">返回</span>
+                </div>
+              </div>
+              <div class="center">
+                <img src="./img/圆加.png" class="button button_gap" style="width: 46px;height: 46px;"
+                  @click="tv_meeting(28)">
+                <div class="button center button_gap" style="width: 100px;height: 58px;" @click="tv_meeting(30)">
+                  <img src="./img/button2.png" class="bg_img">
+                  <span class="simple_text_style">静音</span>
+                </div>
+                <img src="./img/圆减.png" class="button button_gap" style="width: 46px;height: 46px;"
+                  @click="tv_meeting(29)">
+              </div>
+              <div class="center">
+                <div class="button center" style="width: 100px;height: 58px;" @click="tv_meeting(34)">
+                  <img src="./img/button2.png" class="bg_img">
+                  <span class="simple_text_style">显示模式</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- 没有设备时显示 -->
       <div class="center" style="width: 100%;height: 100%;font-size: 24px;color: whitesmoke;"
-        v-show="!static_param.first_load&static_param.menu_select!=0">暂无设备</div>
+        v-show="!static_param.first_load & static_param.menu_select!=0 & static_param.menu_select!=1">暂无设备</div>
     </div>
   </div>
 
