@@ -4,7 +4,8 @@ let login_html_url = login_url + 'api/user/login';
 // 主页面接口
 // let url = 'http://192.168.30.66:18113/';
 let url = 'http://182.150.116.22:18113/';
-let sys_power_url = url + 'api/ake/sequenceSwitch';
+let sys_power_url = url + 'api/room/powerControl';
+// let sys_power_url = url + 'api/ake/sequenceSwitch';
 let sound_box_url = url + 'api/room/loudspeakerBoxLocationControl';
 let video_out_url = url + 'api/room/hdMatrixControl';
 let camera_ctrl_url = url + 'api/room/cameraLocationControl';

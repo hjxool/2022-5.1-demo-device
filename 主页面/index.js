@@ -121,7 +121,7 @@ let config = new Vue({
 		},
 		//导航栏选中
 		menu_select(index) {
-			switch (this.static_param.menu_select) {
+			switch (index) {
 				case 0:
 					this.device_id = '0x12345622F955000000000000';
 					break;
@@ -159,17 +159,9 @@ let config = new Vue({
 		},
 		// 开关电源同时显示遮罩禁用其他板块
 		sys_power_switch() {
-			if (this.static_param.sys_power == 0) {
-				this.static_param.sys_power = 1;
-			} else {
-				this.static_param.sys_power = 0;
-			}
-			this.request('post', sys_power_url, { device_id: '20210628_141157_2446121203218804', sequence_switch: this.static_param.sys_power }, '55555', this.loginToken, () => {
-				if (this.static_param.sys_power == 0) {
-					this.static_param.ban = true;
-				} else {
-					this.static_param.ban = false;
-				}
+			this.static_param.sys_power = this.static_param.sys_power == 0 ? 1 : 0;
+			this.request('post', sys_power_url, { device_id: this.device_id, power_status: this.static_param.sys_power }, '55555', this.loginToken, () => {
+				this.static_param.ban = this.static_param.sys_power == 0 ? true : false;
 			});
 		},
 		// 视频
@@ -202,7 +194,14 @@ let config = new Vue({
 							this.request('post', video_out_url, { device_id: this.device_id, input_no: 1, output_no: this.static_param.video_out_checked + 1 }, '123456', this.loginToken, () => {});
 							break;
 						default:
-							this.request('post', video_out_url, { device_id: this.device_id, input_no: this.static_param.video_source_checked + 1, output_no: this.static_param.video_out_checked + 1 }, '123456', this.loginToken, () => {});
+							this.request(
+								'post',
+								video_out_url,
+								{ device_id: this.device_id, input_no: this.static_param.video_source_checked + 1, output_no: this.static_param.video_out_checked + 1 },
+								'123456',
+								this.loginToken,
+								() => {}
+							);
 							break;
 					}
 				} else {
